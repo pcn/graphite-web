@@ -121,12 +121,8 @@ def lcm(a,b):
   return a * b
 
 def normalize(seriesLists):
-  try:
-    seriesList = reduce(lambda L1,L2: L1+L2,seriesLists)
-    step = reduce(lcm,[s.step for s in seriesList])
-  except TypeError:
-    return []
-  
+  seriesList = reduce(lambda L1,L2: L1+L2,seriesLists)
+  step = reduce(lcm,[s.step for s in seriesList])
   for s in seriesList:
     s.consolidate( step / s.step )
   start = min([s.start for s in seriesList])
@@ -163,7 +159,7 @@ def sumSeries(requestContext, *seriesLists):
 
   try:
     (seriesList,start,end,step) = normalize(seriesLists)
-  except:
+  except TypeError:
     return []
   #name = "sumSeries(%s)" % ','.join((s.name for s in seriesList))
   name = "sumSeries(%s)" % ','.join(set([s.pathExpression for s in seriesList]))
@@ -248,7 +244,10 @@ def diffSeries(requestContext, *seriesLists):
     &target=diffSeries(service.connections.total,5)
 
   """
-  (seriesList,start,end,step) = normalize(seriesLists)
+  try:
+    (seriesList,start,end,step) = normalize(seriesLists)
+  except TypeError:
+    return []
   name = "diffSeries(%s)" % ','.join(set([s.pathExpression for s in seriesList]))
   values = ( safeDiff(row) for row in izip(*seriesList) )
   series = TimeSeries(name,start,end,step,values)
@@ -269,7 +268,10 @@ def averageSeries(requestContext, *seriesLists):
     &target=averageSeries(company.server.*.threads.busy)
 
   """
-  (seriesList,start,end,step) = normalize(seriesLists)
+  try:
+    (seriesList,start,end,step) = normalize(seriesLists)
+  except TypeError:
+    return []
   #name = "averageSeries(%s)" % ','.join((s.name for s in seriesList))
   name = "averageSeries(%s)" % ','.join(set([s.pathExpression for s in seriesList]))
   values = ( safeDiv(safeSum(row),safeLen(row)) for row in izip(*seriesList) )
@@ -290,7 +292,10 @@ def stddevSeries(requestContext, *seriesLists):
     &target=stddevSeries(company.server.*.threads.busy)
 
   """
-  (seriesList,start,end,step) = normalize(seriesLists)
+  try:
+    (seriesList,start,end,step) = normalize(seriesLists)
+  except TypeError:
+    return []
   name = "stddevSeries(%s)" % ','.join(set([s.pathExpression for s in seriesList]))
   values = ( safeStdDev(row) for row in izip(*seriesList) )
   series = TimeSeries(name,start,end,step,values)
@@ -308,7 +313,10 @@ def minSeries(requestContext, *seriesLists):
 
     &target=minSeries(Server*.connections.total)
   """
-  (seriesList, start, end, step) = normalize(seriesLists)
+  try:
+    (seriesList, start, end, step) = normalize(seriesLists)
+  except TypeError:
+    return []
   pathExprs = list( set([s.pathExpression for s in seriesList]) )
   name = "minSeries(%s)" % ','.join(pathExprs)
   values = ( safeMin(row) for row in izip(*seriesList) )
@@ -328,7 +336,10 @@ def maxSeries(requestContext, *seriesLists):
     &target=maxSeries(Server*.connections.total)
 
   """
-  (seriesList, start, end, step) = normalize(seriesLists)
+  try:
+    (seriesList, start, end, step) = normalize(seriesLists)
+  except TypeError:
+    return []
   pathExprs = list( set([s.pathExpression for s in seriesList]) )
   name = "maxSeries(%s)" % ','.join(pathExprs)
   values = ( safeMax(row) for row in izip(*seriesList) )
@@ -348,7 +359,10 @@ def rangeOfSeries(requestContext, *seriesLists):
         &target=rangeOfSeries(Server*.connections.total)
 
     """
-    (seriesList,start,end,step) = normalize(seriesLists)
+    try:
+      (seriesList,start,end,step) = normalize(seriesLists)
+    except TypeError:
+      return []
     name = "rangeOfSeries(%s)" % ','.join(set([s.pathExpression for s in seriesList]))
     values = ( safeSubtract(max(row), min(row)) for row in izip(*seriesList) )
     series = TimeSeries(name,start,end,step,values)
@@ -366,7 +380,10 @@ def percentileOfSeries(requestContext, seriesList, n, interpolate=False):
     raise ValueError('The requested percent is required to be greater than 0')
 
   name = 'percentilesOfSeries(%s,%g)' % (seriesList[0].pathExpression, n)
-  (start, end, step) = normalize([seriesList])[1:]
+  try:
+    (start, end, step) = normalize([seriesList])[1:]
+  except TypeError:
+    return TypeError
   values = [ _getPercentile(row, n, interpolate) for row in izip(*seriesList) ]
   resultSeries = TimeSeries(name, start, end, step, values)
   resultSeries.pathExpression = name
@@ -515,8 +532,10 @@ def multiplySeries(requestContext, *seriesLists):
 
 
   """
-
-  (seriesList,start,end,step) = normalize(seriesLists)
+  try:
+    (seriesList,start,end,step) = normalize(seriesLists)
+  except TypeError:
+    return []
 
   if len(seriesList) == 1:
     return seriesList
@@ -2244,7 +2263,10 @@ def countSeries(requestContext, *seriesLists):
     &target=countSeries(carbon.agents.*.*)
 
   """
-  (seriesList,start,end,step) = normalize(seriesLists)
+  try:
+    (seriesList,start,end,step) = normalize(seriesLists)
+  except TypeError:
+    return []
   name = "countSeries(%s)" % ','.join(set([s.pathExpression for s in seriesList]))
   values = ( int(len(row)) for row in izip(*seriesList) )
   series = TimeSeries(name,start,end,step,values)
