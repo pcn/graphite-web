@@ -121,8 +121,12 @@ def lcm(a,b):
   return a * b
 
 def normalize(seriesLists):
-  seriesList = reduce(lambda L1,L2: L1+L2,seriesLists)
-  step = reduce(lcm,[s.step for s in seriesList])
+  try:
+    seriesList = reduce(lambda L1,L2: L1+L2,seriesLists)
+    step = reduce(lcm,[s.step for s in seriesList])
+  except TypeError:
+    return []
+  
   for s in seriesList:
     s.consolidate( step / s.step )
   start = min([s.start for s in seriesList])
