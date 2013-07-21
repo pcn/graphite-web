@@ -71,7 +71,9 @@ def search_view(request):
 
 
 def find_view(request):
-  "View for finding metrics matching a given pattern"
+  """View for finding metrics matching a given pattern.  Used by
+  e.g. the browser's tree-style navigation
+  """
   profile = getProfile(request)
   format = request.REQUEST.get('format', 'treejson')
   local_only = int( request.REQUEST.get('local', 0) )

@@ -59,6 +59,15 @@ class TimeSeries(list):
 
 
   def __consolidate(self, values):
+    """
+    Consolidates values gotten from the database into the sum of those values
+    for a timeframe.  This is used when e.g. a graph is being rendered but the
+    number of pixels in the graph are less than the number of datapoints that
+    have been read.  This consolidates those data points into a single point.
+
+    :type values: list
+    :param values: a list of integers.
+    """
     usable = [v for v in values if v is not None]
     if not usable: return None
     if self.consolidationFunc == 'sum':
