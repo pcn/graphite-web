@@ -240,7 +240,7 @@ class KairosDBReader(object):
     # time_info = (data.startTime, data.endTime, data.timeStep)
     # values = list(data.values)
 
-    return (time_info, [v[1] for v in values])
+    return (time_info, values)
 
 
 class WhisperReader(object):
