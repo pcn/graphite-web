@@ -4,13 +4,15 @@ from os.path import islink, isdir, isfile, realpath, join, dirname, basename
 from glob import glob
 from ceres import CeresTree, CeresNode, setDefaultSliceCachingBehavior
 from graphite.node import BranchNode, LeafNode
-from graphite.readers import CeresReader, WhisperReader, GzippedWhisperReader, RRDReader
+from graphite.readers import CeresReader, WhisperReader, GzippedWhisperReader, RRDReader, KairosDBReader
 from graphite.util import find_escaped_pattern_fields
 
 from graphite.logger import log
 
-#setDefaultSliceCachingBehavior('all')
+import pyKairosDB
+from pyKairosDB import graphite as pyk_graphite
 
+#setDefaultSliceCachingBehavior('all')
 
 class CeresFinder:
   def __init__(self, directory):
@@ -32,6 +34,40 @@ class CeresFinder:
       elif isdir(fs_path):
         yield BranchNode(metric_path)
 
+class KairosDBFinder:
+  """This class will take a path (e.g. "carbon.foo.bar") and return a
+  node object.  If this is a leaf node (has no other names underneath
+  it) then return a LeafNode object.  Otherwise, return  BranchNode object.
+
+  """
+  def __init__(self, kairosdb_server, kairosdb_port):
+    """The directory argument seems to be un-necessary in this case, but it's part of the API I think
+
+    :type directory: str
+    :param directory: An un-needed argument that seems to be part of the API?
+    """
+
+    self.kairosdb_server=kairosdb_server
+    self.kairosdb_port=kairosdb_port
+    self.conn = pyKairosDB.connect(kairosdb_server, kairosdb_port) # XXX get connection info from configuration, use default for testing
+
+  def find_nodes(self, query):
+    """
+    find_nodes is provided a query - an instance of a storage.FindQuery class.
+
+    This is used to traverse the tree of metric names, returning a LeafNode if this
+    is a leaf node, and a BranchNode if it is not.
+    """
+    print "Trying to find_nodes kairosdbfinder in finders"
+    # print "metric paths are {0}".format(pyk_graphite.expand_graphite_wildcard_metric_name(self.conn, query.pattern))
+    for metric_path in pyk_graphite.expand_graphite_wildcard_metric_name(self.conn, query.pattern):
+      kind_of_node = pyk_graphite.leaf_or_branch(self.conn, metric_path)
+      print "kind_of_node is {0}".format(kind_of_node)
+      reader = KairosDBReader(self.conn, metric_path)
+      if kind_of_node is "branch":
+          yield BranchNode(metric_path)
+      else: # it's "leaf"
+          yield LeafNode(metric_path, reader)
 
 class StandardFinder:
   DATASOURCE_DELIMETER = '::RRD_DATASOURCE::'

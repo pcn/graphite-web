@@ -6,7 +6,7 @@ from graphite.remote_storage import RemoteStore
 from graphite.node import LeafNode
 from graphite.intervals import Interval, IntervalSet
 from graphite.readers import MultiReader
-from graphite.finders import CeresFinder, StandardFinder
+from graphite.finders import CeresFinder, StandardFinder, KairosDBFinder
 
 
 class Store:
@@ -17,6 +17,11 @@ class Store:
 
 
   def find(self, pattern, startTime=None, endTime=None, local=False):
+    """The Store object has a list of finders.  Each finder is a class
+    that can find metrics within its storage system, and which can
+    return an object that can access the metric within that
+    datastore.
+    """
     query = FindQuery(pattern, startTime, endTime)
 
     # Start remote searches
@@ -27,6 +32,7 @@ class Store:
 
     # Search locally
     for finder in self.finders:
+      print "finder is {0}".format(finder)
       for node in finder.find_nodes(query):
         #log.info("find() :: local :: %s" % node)
         matching_nodes.add(node)
@@ -151,4 +157,8 @@ finders = [
   CeresFinder(settings.CERES_DIR),
   StandardFinder(settings.STANDARD_DIRS),
 ]
+# Use KairosDB?
+if 'KAIROSDB_SERVER' in dir(settings) and 'KAIROSDB_PORT' in dir(settings):
+  finders.append(KairosDBFinder(settings.KAIROSDB_SERVER, settings.KAIROSDB_PORT))
+
 STORE = Store(finders, hosts=settings.CLUSTER_SERVERS)
