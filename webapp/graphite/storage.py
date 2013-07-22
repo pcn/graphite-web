@@ -32,7 +32,6 @@ class Store:
 
     # Search locally
     for finder in self.finders:
-      print "finder is {0}".format(finder)
       for node in finder.find_nodes(query):
         #log.info("find() :: local :: %s" % node)
         matching_nodes.add(node)

@@ -58,11 +58,8 @@ class KairosDBFinder:
     This is used to traverse the tree of metric names, returning a LeafNode if this
     is a leaf node, and a BranchNode if it is not.
     """
-    print "Trying to find_nodes kairosdbfinder in finders"
-    # print "metric paths are {0}".format(pyk_graphite.expand_graphite_wildcard_metric_name(self.conn, query.pattern))
     for metric_path in pyk_graphite.expand_graphite_wildcard_metric_name(self.conn, query.pattern):
       kind_of_node = pyk_graphite.leaf_or_branch(self.conn, metric_path)
-      print "kind_of_node is {0}".format(kind_of_node)
       reader = KairosDBReader(self.conn, metric_path)
       if kind_of_node is "branch":
           yield BranchNode(metric_path)
