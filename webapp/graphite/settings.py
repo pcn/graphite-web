@@ -188,7 +188,3 @@ if USE_LDAP_AUTH:
   AUTHENTICATION_BACKENDS.insert(0,'graphite.account.ldapBackend.LDAPBackend')
 
 REMOTE_STORE_RETRY_DELAY=1
-
-# Connect to kairosdb?
-KAIROSDB_SERVER='localhost'
-KAIROSDB_PORT="8080"

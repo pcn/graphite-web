@@ -134,7 +134,7 @@
 # NOTE: Ignored if DASHBOARD_REQUIRE_AUTHENTICATION is not set
 #DASHBOARD_REQUIRE_EDIT_GROUP = 'dashboard-editors-group'
 
-# If set to True, dashboards can be saved or deleted by any user having the appropriate 
+# If set to True, dashboards can be saved or deleted by any user having the appropriate
 # (change or delete) permission (as set in the Django Admin app).  Defaults to False
 # NOTE: Ignored if DASHBOARD_REQUIRE_AUTHENTICATION is not set
 #DASHBOARD_REQUIRE_PERMISSIONS = True
@@ -242,3 +242,8 @@
 # MIDDLEWARE_CLASSES or APPS
 #from graphite.app_settings import *
 
+#####################################
+# Connect to kairosdb
+#####################################
+# KAIROSDB_SERVER='localhost'
+# KAIROSDB_PORT="8080"
