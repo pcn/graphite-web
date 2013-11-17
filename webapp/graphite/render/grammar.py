@@ -63,9 +63,9 @@ pathExpression = Combine(
   )
 )('pathExpression')
 
-expression << Group(call | pathExpression)('expression')
+expression <<= Group(call | pathExpression)('expression')
 
-grammar << expression
+grammar <<= expression
 
 def enableDebug():
   for name,obj in globals().items():
