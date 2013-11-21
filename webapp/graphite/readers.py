@@ -204,6 +204,8 @@ class KairosDBReader(object):
 
     # Interval finding is waiting on https://code.google.com/p/kairosdb/issues/detail?id=12
     # For now, use a bogus interval - it doesn't seem to be that important as long as there is one?
+    # That's right, this is an internal detail to ceres, and outside of ceres nothing else should
+    # care about it.
     intervals.append(Interval(time.time()-3600, time.time()))
     return IntervalSet(intervals)
 

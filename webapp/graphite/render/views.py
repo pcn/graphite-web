@@ -46,6 +46,22 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
 
+def render_pie_graph(request_context, request_options):
+    for target in request_options['targets']:
+      if target.find(':') >= 0:
+        try:
+          name,value = target.split(':',1)
+          value = float(value)
+        except:
+          raise ValueError, "Invalid target '%s'" % target
+        data.append( (name,value) )
+      else:
+        series_list = evaluateTarget(request_context, target)
+        for series in series_list:
+          func = PieFunctions[requestOptions['pieMode']]
+          requet_context['data'].append( (series.name, func(request_context, series) or 0 ))
+    return request_context
+
 def renderView(request):
   start = time()
   (graphOptions, requestOptions) = parseOptions(request)
@@ -72,21 +88,7 @@ def renderView(request):
 
   # Now we prepare the requested data
   if requestOptions['graphType'] == 'pie':
-    for target in requestOptions['targets']:
-      if target.find(':') >= 0:
-        try:
-          name,value = target.split(':',1)
-          value = float(value)
-        except:
-          raise ValueError, "Invalid target '%s'" % target
-        data.append( (name,value) )
-      else:
-        seriesList = evaluateTarget(requestContext, target)
-
-        for series in seriesList:
-          func = PieFunctions[requestOptions['pieMode']]
-          data.append( (series.name, func(requestContext, series) or 0 ))
-
+    requestContext = get_pie_request(requestContext)
   elif requestOptions['graphType'] == 'line':
     # Let's see if at least our data is cached
     if useCache:

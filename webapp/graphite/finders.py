@@ -9,8 +9,10 @@ from graphite.util import find_escaped_pattern_fields
 
 from graphite.logger import log
 
+# XXX put try+exepts around imports, or check readers.kairos
 import pyKairosDB
 from pyKairosDB import graphite as pyk_graphite
+
 
 #setDefaultSliceCachingBehavior('all')
 
@@ -58,12 +60,13 @@ class KairosDBFinder:
     This is used to traverse the tree of metric names, returning a LeafNode if this
     is a leaf node, and a BranchNode if it is not.
     """
+    print "Finding {0}".format(query)
     for metric_path in pyk_graphite.expand_graphite_wildcard_metric_name(self.conn, query.pattern):
       kind_of_node = pyk_graphite.leaf_or_branch(self.conn, metric_path)
-      reader = KairosDBReader(self.conn, metric_path)
       if kind_of_node is "branch":
           yield BranchNode(metric_path)
       else: # it's "leaf"
+          reader = KairosDBReader(self.conn, metric_path)
           yield LeafNode(metric_path, reader)
 
 class StandardFinder:

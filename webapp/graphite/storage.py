@@ -124,7 +124,9 @@ class Store:
       elif len(minimal_node_set) > 1:
         reader = MultiReader(minimal_node_set)
         yield LeafNode(path, reader)
-
+      else:
+        print leaf_nodes
+        yield leaf_nodes.pop()
 
 
 class FindQuery:
